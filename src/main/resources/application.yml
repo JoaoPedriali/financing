@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: financing
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/financing
+    username: root
+    password: root
+  artemis:
+    mode: native
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: adminpass
+    embedded:
+      queues: transactions
+
+  flyway:
+    sql-migration-prefix: V
+    repeatable-sql-migration-prefix: R
+    sql-migration-separator: __
+    sql-migration-suffixes:
+      - .sql
+
+server:
+  port: 8080
