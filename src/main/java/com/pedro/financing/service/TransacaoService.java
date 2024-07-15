@@ -1,36 +1,38 @@
 package com.pedro.financing.service;
 
 import com.pedro.financing.controller.v1.request.TransactionRequest;
-import com.pedro.financing.dto.TransacaoDTO;
 import com.pedro.financing.model.Transacao;
-import com.pedro.financing.repository.TransacaoRepository;
 import com.pedro.financing.processor.TransactionProcessorFactory;
+import com.pedro.financing.repository.TransacaoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class TransacaoService {
 
-
+    @Autowired
     private TransacaoRepository transacaoRepository;
-    private TransactionProcessorFactory factory;
+    private final TransactionProcessorFactory factory = new TransactionProcessorFactory();
 
-    Logger log = LoggerFactory.getLogger(TransacaoService.class);
     ModelMapper modelMapper = new ModelMapper();
 
     @JmsListener(destination = "${spring.artemis.embedded.queues}", containerFactory = "jmsFactory")
-    public TransacaoDTO processTransacao(TransactionRequest message) {
+    public void processTransacao(TransactionRequest message) {
 
+        log.info("Message: {}", message.toString());
         var processor = factory.createTransactionProcessor(message.getApp());
 
+        log.info("Processor: {}", processor);
         var dto = processor.processNotificacao(message.getNotificacao());
 
         var transacao = modelMapper.map(dto, Transacao.class);
 
-        return modelMapper.map(transacaoRepository.save(transacao), TransacaoDTO.class);
+        log.info("DTO: {}", dto.toString());
+        transacaoRepository.save(transacao);
 
     }
 }
