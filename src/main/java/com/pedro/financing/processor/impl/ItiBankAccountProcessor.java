@@ -24,7 +24,7 @@ public class ItiBankAccountProcessor implements TransactionProcessor {
             return processPixDebit(notificacao);
         }
 
-        return null;
+        throw new IllegalArgumentException("Type of notification is not valid for this provider");
     }
 
     private TransacaoDTO processPixDebit(String notificacao) {
@@ -41,7 +41,7 @@ public class ItiBankAccountProcessor implements TransactionProcessor {
         var instituicaoPattern = Pattern.compile("iti para \\w.*\\(").matcher(notificacao);
 
         if(!valueMatcher.find()) {
-            throw new RuntimeException("Value of notification nor found");
+            throw new IllegalArgumentException("Value of notification not found");
         }
 
         // Clears out R$ and , from string e.g: R$123,45 -> 12345
@@ -58,7 +58,7 @@ public class ItiBankAccountProcessor implements TransactionProcessor {
 
         if(instituicaoPattern.find()) {
             // Removes matcher string and '(' at the end of the string
-            var instituicao = instituicaoPattern.group(0).replace("iti para", "").replace(" (", "");
+            var instituicao = instituicaoPattern.group(0).replace("iti para ", "").replace(" (", "");
             log.info("Instituicao: {}", instituicao);
             transacaoDTO.setInstituicao(instituicao);
         }

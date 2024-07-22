@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -23,5 +24,7 @@ public class TransacaoDTO {
 
     private String instituicao;
 
-    private LocalDateTime data;
+    private Instant createdAt;
+
+    private Instant updatedAt;
 }
